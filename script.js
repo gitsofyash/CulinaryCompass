@@ -5,6 +5,7 @@ const RECIPES_PER_PAGE = 20;
 
 async function initializeApp() {
     try {
+        // Update the API URL in initializeApp function
         const apiUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:3000/api/key'
             : '/api/key';
