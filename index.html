@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CulinaryCompass - Recipe Finder</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <h1>CulinaryCompass</h1>
+            </div>
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Search for delicious recipes...">
+                    <button id="searchBtn">Search</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="hero-section">
+            <h2>Discover Amazing Recipes</h2>
+            <p>Find your next culinary adventure with thousands of recipes</p>
+        </div>
+
+        <div class="filters-container">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="cuisineFilter">Cuisine</label>
+                    <select id="cuisineFilter">
+                        <option value="">All Cuisines</option>
+                        <option value="italian">Italian</option>
+                        <option value="indian">Indian</option>
+                        <option value="mexican">Mexican</option>
+                        <option value="chinese">Chinese</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dietFilter">Diet</label>
+                    <select id="dietFilter">
+                        <option value="">All Diets</option>
+                        <option value="vegetarian">Vegetarian</option>
+                        <option value="vegan">Vegan</option>
+                        <option value="gluten-free">Gluten Free</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="recipe-grid" id="recipeGrid">
+            <!-- Recipes will be dynamically added here -->
+        </div>
+
+        <div class="pagination">
+            <button id="prevPage" class="page-btn"><i class="fas fa-chevron-left"></i> Previous</button>
+            <span id="currentPage">Page 1</span>
+            <button id="nextPage" class="page-btn">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+    </main>
+
+    <div id="recipeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="recipeDetails"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-utensils"></i>
+                <h3>CulinaryCompass</h3>
+            </div>
+            <p>&copy; 2024 CulinaryCompass - Your Recipe Finding Companion</p>
+        </div>
+    </footer>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
