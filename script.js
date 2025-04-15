@@ -1,10 +1,26 @@
 
-import config from './config.js';
-const API_KEY = config.apiKey;
+let API_KEY;
 const BASE_URL = 'https://api.spoonacular.com/recipes';
 const RECIPES_PER_PAGE = 20;
 
-document.addEventListener('DOMContentLoaded', function() {
+async function initializeApp() {
+    try {
+        const apiUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/api/key'
+            : '/api/key';
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        API_KEY = data.key;
+        setupEventListeners();
+        // Initial recipe load
+        fetchRandomRecipes();
+    } catch (error) {
+        console.error('Error fetching API key:', error);
+        document.getElementById('recipeGrid').innerHTML = '<p>Error initializing application. Please try again later.</p>';
+    }
+}
+
+function setupEventListeners() {
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
     const cuisineFilter = document.getElementById('cuisineFilter');
@@ -19,26 +35,32 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
     let totalResults = 0;
 
-    // Initial recipe load
-    fetchRandomRecipes();
-
-    // Search functionality
+    // Event Listeners
     searchBtn.addEventListener('click', handleSearch);
     searchInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') handleSearch();
     });
-
-    // Filter changes
     cuisineFilter.addEventListener('change', handleSearch);
     dietFilter.addEventListener('change', handleSearch);
-
-    // Modal close
     closeBtn.addEventListener('click', () => modal.style.display = 'none');
     window.addEventListener('click', (e) => {
         if (e.target === modal) modal.style.display = 'none';
     });
+    prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            handleSearch();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+    nextPageBtn.addEventListener('click', () => {
+        currentPage++;
+        handleSearch();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-    async function fetchRandomRecipes() {
+    // Move fetchRandomRecipes outside setupEventListeners
+    window.fetchRandomRecipes = async function() {
         try {
             const response = await fetch(
                 `${BASE_URL}/random?number=${RECIPES_PER_PAGE}&apiKey=${API_KEY}`
@@ -47,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log('Random recipes data:', data); // Debug log
             renderRecipes(data.recipes);
             updatePaginationControls(RECIPES_PER_PAGE, RECIPES_PER_PAGE);
         } catch (error) {
@@ -60,6 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchTerm = searchInput.value;
         const cuisine = cuisineFilter.value;
         const diet = dietFilter.value;
+
+        if (!searchTerm && !cuisine && !diet) {
+            currentPage = 1;
+            fetchRandomRecipes();
+            return;
+        }
 
         try {
             const params = new URLSearchParams({
@@ -77,7 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            console.log('Search results:', data); // Debug log
             totalResults = data.totalResults;
             renderRecipes(data.results);
             updatePaginationControls(totalResults, RECIPES_PER_PAGE);
@@ -100,35 +126,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add pagination controls event listeners
-    prevPageBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            handleSearch();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    });
-
-    nextPageBtn.addEventListener('click', () => {
-        currentPage++;
-        handleSearch();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
     function updatePaginationControls(total, perPage) {
         const totalPages = Math.ceil(total / perPage);
         currentPageSpan.textContent = `Page ${currentPage} of ${totalPages}`;
         
         prevPageBtn.disabled = currentPage <= 1;
         nextPageBtn.disabled = currentPage >= totalPages;
-    }
-
-    function renderRecipes(recipes) {
-        recipeGrid.innerHTML = '';
-        recipes.forEach(recipe => {
-            const card = createRecipeCard(recipe);
-            recipeGrid.appendChild(card);
-        });
     }
 
     function createRecipeCard(recipe) {
@@ -178,4 +181,6 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         modal.style.display = 'block';
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
